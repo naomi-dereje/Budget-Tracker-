@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile & Settings | Student Budget Tracker</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon">🎓</div>
+                <div>
+                    <div class="brand-title">BudgetTracker</div>
+                    <div class="brand-subtitle">Student Edition</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a href="/transactions.html" class="nav-item">
+                    <span class="nav-icon">💳</span> Transactions
+                </a>
+                <a href="/budgets.html" class="nav-item">
+                    <span class="nav-icon">🎯</span> Monthly Budgets
+                </a>
+                <a href="/categories.html" class="nav-item">
+                    <span class="nav-icon">🏷️</span> Categories
+                </a>
+                <a href="/reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span> Financial Reports
+                </a>
+                <a href="/profile.html" class="nav-item active">
+                    <span class="nav-icon">⚙️</span> Settings & Profile
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-snippet">
+                    <div class="user-avatar js-user-avatar">ST</div>
+                    <div>
+                        <div class="user-name-snippet js-user-name">Loading...</div>
+                        <div class="user-univ-snippet js-user-univ">University</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-icon" title="Logout" onclick="handleLogout()">🚪</button>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" id="menu-toggle" class="btn-icon menu-toggle" style="display: none;">☰</button>
+                    <h1 class="page-title">Profile & Preferences</h1>
+                </div>
+
+                <div class="topbar-actions">
+                    <button type="button" id="theme-toggle-btn" class="btn-icon" title="Toggle theme">🌙</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="handleLogout()">
+                        Sign Out
+                    </button>
+                </div>
+            </header>
+
+            <main class="content-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+                    <!-- Student Profile Information Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Student Profile</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="prof-email">University Email</label>
+                                    <input type="email" id="prof-email" class="form-input" disabled style="background: var(--bg-subtle); cursor: not-allowed;">
+                                    <span class="form-help">Email cannot be modified directly once registered.</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="prof-name">Full Name</label>
+                                    <input type="text" id="prof-name" class="form-input" required maxlength="100">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="prof-univ">University / College</label>
+                                    <input type="text" id="prof-univ" class="form-input" placeholder="e.g. State University" maxlength="150">
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prof-currency">Currency Symbol</label>
+                                        <select id="prof-currency" class="form-select">
+                                            <option value="$">$ (USD / CAD / AUD)</option>
+                                            <option value="€">€ (EUR)</option>
+                                            <option value="£">£ (GBP)</option>
+                                            <option value="¥">¥ (JPY / CNY)</option>
+                                            <option value="₹">₹ (INR)</option>
+                                            <option value="₱">₱ (PHP)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prof-baseline">Default Monthly Budget</label>
+                                        <input type="number" id="prof-baseline" class="form-input" step="0.01" min="0">
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="save-profile-btn" class="btn btn-primary" style="margin-top: 10px;">
+                                    Save Profile Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Security & Change Password Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Security & Password</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="curr-password">Current Password</label>
+                                    <input type="password" id="curr-password" class="form-input" required autocomplete="current-password">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="new-password">New Password</label>
+                                    <input type="password" id="new-password" class="form-input" minlength="6" required autocomplete="new-password">
+                                    <span class="form-help">Must be at least 6 characters.</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="confirm-new-password">Confirm New Password</label>
+                                    <input type="password" id="confirm-new-password" class="form-input" minlength="6" required autocomplete="new-password">
+                                </div>
+
+                                <button type="submit" id="change-pw-btn" class="btn btn-secondary" style="margin-top: 10px;">
+                                    Update Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+</html>

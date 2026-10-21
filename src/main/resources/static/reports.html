@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reports & Analytics | Student Budget Tracker</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        @media print {
+            .sidebar, .topbar-actions, #filter-card, .btn-print {
+                display: none !important;
+            }
+            .main-wrapper {
+                margin-left: 0 !important;
+            }
+            .content-body {
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon">🎓</div>
+                <div>
+                    <div class="brand-title">BudgetTracker</div>
+                    <div class="brand-subtitle">Student Edition</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a href="/transactions.html" class="nav-item">
+                    <span class="nav-icon">💳</span> Transactions
+                </a>
+                <a href="/budgets.html" class="nav-item">
+                    <span class="nav-icon">🎯</span> Monthly Budgets
+                </a>
+                <a href="/categories.html" class="nav-item">
+                    <span class="nav-icon">🏷️</span> Categories
+                </a>
+                <a href="/reports.html" class="nav-item active">
+                    <span class="nav-icon">📈</span> Financial Reports
+                </a>
+                <a href="/profile.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span> Settings & Profile
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-snippet">
+                    <div class="user-avatar js-user-avatar">ST</div>
+                    <div>
+                        <div class="user-name-snippet js-user-name">Loading...</div>
+                        <div class="user-univ-snippet js-user-univ">University</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-icon" title="Logout" onclick="handleLogout()">🚪</button>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" id="menu-toggle" class="btn-icon menu-toggle" style="display: none;">☰</button>
+                    <h1 class="page-title">Financial Reports & Insights</h1>
+                </div>
+
+                <div class="topbar-actions">
+                    <button type="button" id="theme-toggle-btn" class="btn-icon" title="Toggle theme">🌙</button>
+                    <button type="button" class="btn btn-secondary btn-sm btn-print" onclick="window.print()">
+                        🖨️ Print Report
+                    </button>
+                </div>
+            </header>
+
+            <main class="content-body">
+                <!-- Date Range Filter Card -->
+                <div class="card" id="filter-card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 16px 20px;">
+                        <form id="report-filter-form" style="display: flex; gap: 16px; align-items: end; flex-wrap: wrap;">
+                            <div>
+                                <label class="form-label" style="font-size: 12px;">Quick Presets</label>
+                                <div style="display: flex; gap: 6px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="setPreset('this-month')">This Month</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="setPreset('last-month')">Last Month</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="setPreset('last-90-days')">Semester (90 Days)</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label" for="report-start" style="font-size: 12px;">From Date</label>
+                                <input type="date" id="report-start" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label" for="report-end" style="font-size: 12px;">To Date</label>
+                                <input type="date" id="report-end" class="form-input">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="height: 40px;">
+                                Generate Analytics
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Summary Metrics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Period Income</span>
+                            <div class="stat-icon-wrapper stat-icon-success">💰</div>
+                        </div>
+                        <div class="stat-value" id="rep-income">$0.00</div>
+                        <div class="stat-subtext" id="rep-income-sub">Inflow for period</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Period Expenses</span>
+                            <div class="stat-icon-wrapper stat-icon-danger">💸</div>
+                        </div>
+                        <div class="stat-value" id="rep-expense">$0.00</div>
+                        <div class="stat-subtext" id="rep-expense-sub">Outflow for period</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Net Savings</span>
+                            <div class="stat-icon-wrapper stat-icon-primary">⚖️</div>
+                        </div>
+                        <div class="stat-value" id="rep-savings">$0.00</div>
+                        <div class="stat-subtext" id="rep-rate">Savings Rate: 0.0%</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Daily Average Expense</span>
+                            <div class="stat-icon-wrapper stat-icon-warning">📅</div>
+                        </div>
+                        <div class="stat-value" id="rep-daily">$0.00</div>
+                        <div class="stat-subtext" id="rep-tx-count">0 recorded transactions</div>
+                    </div>
+                </div>
+
+                <!-- Daily Spending Timeline Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Daily Spending & Income Activity</h3>
+                        <span style="font-size: 13px; color: var(--text-muted);" id="rep-period-label">Period</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="chart-daily-timeline"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Tables Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                    <!-- Expense Categories Breakdown -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Expense Breakdown by Category</h3>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th style="text-align: right;">Amount</th>
+                                            <th style="text-align: right;">Share</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rep-expense-cat-tbody">
+                                        <tr><td colspan="3" style="text-align: center; padding: 24px; color: var(--text-muted);">No expenses in this period</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Income Categories Breakdown -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Income Sources Breakdown</h3>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th style="text-align: right;">Amount</th>
+                                            <th style="text-align: right;">Share</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rep-income-cat-tbody">
+                                        <tr><td colspan="3" style="text-align: center; padding: 24px; color: var(--text-muted);">No income in this period</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget vs Actual Spending Comparison -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Budget vs. Actual Spending (Latest Month in Range)</h3>
+                        <span style="font-size: 13px; color: var(--text-muted);">Variance analysis</span>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th style="text-align: right;">Budgeted</th>
+                                        <th style="text-align: right;">Actual Spent</th>
+                                        <th style="text-align: right;">Variance (+/-)</th>
+                                        <th style="text-align: center;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rep-variance-tbody">
+                                    <tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">No budget limits defined for this period</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/reports.js"></script>
+</body>
+</html>

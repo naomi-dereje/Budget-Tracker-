@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Management | Student Budget Tracker</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon">🎓</div>
+                <div>
+                    <div class="brand-title">BudgetTracker</div>
+                    <div class="brand-subtitle">Student Edition</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a href="/transactions.html" class="nav-item">
+                    <span class="nav-icon">💳</span> Transactions
+                </a>
+                <a href="/budgets.html" class="nav-item active">
+                    <span class="nav-icon">🎯</span> Monthly Budgets
+                </a>
+                <a href="/categories.html" class="nav-item">
+                    <span class="nav-icon">🏷️</span> Categories
+                </a>
+                <a href="/reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span> Financial Reports
+                </a>
+                <a href="/profile.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span> Settings & Profile
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-snippet">
+                    <div class="user-avatar js-user-avatar">ST</div>
+                    <div>
+                        <div class="user-name-snippet js-user-name">Loading...</div>
+                        <div class="user-univ-snippet js-user-univ">University</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-icon" title="Logout" onclick="handleLogout()">🚪</button>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" id="menu-toggle" class="btn-icon menu-toggle" style="display: none;">☰</button>
+                    <h1 class="page-title">Monthly Budgets</h1>
+                </div>
+
+                <div class="topbar-actions">
+                    <!-- Month Selector -->
+                    <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 4px 8px;">
+                        <button type="button" id="prev-month-btn" class="btn-icon" style="padding: 4px 8px; border: none;">◀</button>
+                        <input type="month" id="budget-month" style="border: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                        <button type="button" id="next-month-btn" class="btn-icon" style="padding: 4px 8px; border: none;">▶</button>
+                    </div>
+
+                    <button type="button" id="theme-toggle-btn" class="btn-icon" title="Toggle theme">🌙</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openBudgetEditorModal()">
+                        ✏️ Configure Budget
+                    </button>
+                </div>
+            </header>
+
+            <main class="content-body">
+                <!-- Monthly Overall Budget Card -->
+                <div class="card" style="margin-bottom: 28px;">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title" id="overview-month-title">Monthly Budget Overview</h3>
+                            <span id="budget-notes" style="font-size: 13px; color: var(--text-muted);">Semester plan</span>
+                        </div>
+                        <span id="budget-status-badge" class="badge badge-neutral">Status</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Allocated Limit</div>
+                                <div id="overview-limit" style="font-size: 24px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">$0.00</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Actual Spent</div>
+                                <div id="overview-spent" style="font-size: 24px; font-weight: 800; color: var(--danger); margin-top: 4px;">$0.00</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Remaining Budget</div>
+                                <div id="overview-remaining" style="font-size: 24px; font-weight: 800; color: var(--success); margin-top: 4px;">$0.00</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Utilization Rate</div>
+                                <div id="overview-utilization" style="font-size: 24px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">0.0%</div>
+                            </div>
+                        </div>
+
+                        <!-- Main Progress Bar -->
+                        <div class="progress-container" style="height: 12px;">
+                            <div id="overview-progress" class="progress-bar progress-success" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Spending Budgets -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Category Spending Limits & Utilization</h3>
+                        <span style="font-size: 13px; color: var(--text-muted);">Calculated automatically from expense records</span>
+                    </div>
+                    <div class="card-body" id="category-budgets-container">
+                        <div style="text-align: center; padding: 32px; color: var(--text-muted);">
+                            Loading category budget limits...
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Configure Budget Modal -->
+    <div id="budget-modal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Configure Monthly Budget</h3>
+                <button type="button" class="modal-close" onclick="closeModal('budget-modal')">×</button>
+            </div>
+            <form id="budget-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="modal-month">Month (YYYY-MM)</label>
+                        <input type="month" id="modal-month" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="modal-total-limit">Overall Monthly Spending Limit</label>
+                        <input type="number" id="modal-total-limit" class="form-input" placeholder="e.g. 1200.00" step="0.01" min="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="modal-notes">Budget Notes (Optional)</label>
+                        <input type="text" id="modal-notes" class="form-input" placeholder="e.g. Fall Semester Midterms Month" maxlength="255">
+                    </div>
+
+                    <div style="margin-top: 24px; margin-bottom: 12px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                        Category Spending Allocations (Optional)
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+                        Set specific limits for expense categories to track your spending habits and avoid overspending.
+                    </p>
+
+                    <div id="category-allocations-inputs" style="display: flex; flex-direction: column; gap: 12px; max-height: 240px; overflow-y: auto; padding-right: 6px;">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('budget-modal')">Cancel</button>
+                    <button type="submit" id="save-budget-btn" class="btn btn-primary">Save Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/budgets.js"></script>
+</body>
+</html>
